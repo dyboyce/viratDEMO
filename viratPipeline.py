@@ -1,6 +1,7 @@
 import cv2
 import numpy as np
 import os
+import re
 
 
 def check_frame(curr_frame, objects_arr, events_arr, image):
@@ -33,18 +34,28 @@ def draw_box(s1, s2, x, y, image):
 
 
 def write_video():
+    #testing
+    print('Write Video called ---')
     im_folder = '.'
     video_name = 'recompiled.avi'
     #os.chdir("C:\User\dylan\Documents\\viratDEMO")
     images_arr = [img for img in os.listdir(im_folder)
               if img.endswith(".jpg")]
+    #sort below taken from (https://stackoverflow.com/questions/33159106/sort-filenames-in-directory-in-ascending-order)
+    #User Stefan Pochmann 11/26/21 11:30pm
+    images_arr.sort(key=lambda f: int(re.sub('\D', '', f)))
+    #testing
+    print(images_arr)
 
     vidframe = cv2.imread(os.path.join(im_folder, images_arr[0]))
     height, width, layers = vidframe.shape
 
-    video = cv2.VideoWriter(video_name, 0, 1, (width, height))
+    video = cv2.VideoWriter(video_name, 0, 30, (width, height))
 
     for image in images_arr:
+        #testing
+        print(image.title())
+
         video.write(cv2.imread(os.path.join(im_folder, image)))
 
     cv2.destroyAllWindows()
