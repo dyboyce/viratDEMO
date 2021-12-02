@@ -2,6 +2,9 @@ import cv2
 import numpy as np
 import os
 import re
+from natsort import natsorted
+
+from YoloDectection import YoloDetection
 
 
 def check_frame(curr_frame, objects_arr, events_arr, image):
@@ -43,7 +46,8 @@ def write_video():
               if img.endswith(".jpg")]
     #sort below taken from (https://stackoverflow.com/questions/33159106/sort-filenames-in-directory-in-ascending-order)
     #User Stefan Pochmann 11/26/21 11:30pm
-    images_arr.sort(key=lambda f: int(re.sub('\D', '', f)))
+    images_arr = natsorted(images_arr)
+    #images_arr.sort(key=lambda f: int(re.sub('\D', '', f)))
     #testing
     print(images_arr)
 
@@ -67,20 +71,24 @@ def write_video():
 vidcap = cv2.VideoCapture('VIRAT_S_000207_04_000902_000934.mp4')
 success, image = vidcap.read()
 count = 0
-color = (255, 255, 255)
+# generate different colors for different classes
+#stick this back in the frame by frame part to get a wild ride of colors
+#
+COLORS = np.random.uniform(0, 255, size=(80, 3))
+
 thickness = 5
 
 vid_objects, vid_events = read_in_boxes()
 
 while success:
     image = check_frame(count, vid_objects, vid_events, image)
-
+    image = YoloDetection(image, COLORS)
     cv2.imwrite("frame%d.jpg" % count, image)  # save frame as JPEG file
     success, image = vidcap.read()
     print('Read a new frame: ', count)
     count += 1
 
-    if count > 120:
+    if count > 400:
         break
 
 write_video()
